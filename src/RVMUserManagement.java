@@ -5,12 +5,14 @@ class User {
     private String password;
     private int totalBottlesRecycled;
     private double rewardsEarned;
+    private List<String> transactionHistory;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.totalBottlesRecycled = 0;
         this.rewardsEarned = 0.0;
+        this.transactionHistory = new ArrayList<>();
     }
 
     public String getUsername() {
@@ -24,6 +26,8 @@ class User {
     public void addRecycledBottles(int count, double rewardPerBottle) {
         this.totalBottlesRecycled += count;
         this.rewardsEarned += count * rewardPerBottle;
+        String transaction = "Recycled " + count + " bottles. Earned $" + (count * rewardPerBottle);
+        transactionHistory.add(transaction);
     }
 
     public void displayProfile() {
@@ -31,6 +35,31 @@ class User {
         System.out.println("Username: " + username);
         System.out.println("Total Bottles Recycled: " + totalBottlesRecycled);
         System.out.println("Rewards Earned: $" + rewardsEarned);
+    }
+
+    public void displayTransactionHistory() {
+        System.out.println("\nTransaction History:");
+        if (transactionHistory.isEmpty()) {
+            System.out.println("No transactions available.");
+        } else {
+            for (String transaction : transactionHistory) {
+                System.out.println(transaction);
+            }
+        }
+    }
+
+    public double getRewardsEarned() {
+        return rewardsEarned;
+    }
+
+    public void redeemRewards(double amount) {
+        if (amount > 0 && amount <= rewardsEarned) {
+            rewardsEarned -= amount;
+            transactionHistory.add("Redeemed $" + amount + " rewards.");
+            System.out.println("Successfully redeemed $" + amount + " rewards.");
+        } else {
+            System.out.println("Invalid amount or insufficient rewards.");
+        }
     }
 }
 
@@ -99,7 +128,9 @@ class RVMSystem {
             System.out.println("\n--- User Menu ---");
             System.out.println("1. Recycle Bottles");
             System.out.println("2. View Profile");
-            System.out.println("3. Logout");
+            System.out.println("3. View Transaction History");
+            System.out.println("4. Redeem Rewards");
+            System.out.println("5. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -112,6 +143,12 @@ class RVMSystem {
                     user.displayProfile();
                     break;
                 case 3:
+                    user.displayTransactionHistory();
+                    break;
+                case 4:
+                    redeemRewards(user);
+                    break;
+                case 5:
                     System.out.println("Logging out...");
                     return;
                 default:
@@ -130,6 +167,12 @@ class RVMSystem {
         } else {
             System.out.println("Invalid number of bottles.");
         }
+    }
+
+    private void redeemRewards(User user) {
+        System.out.print("Enter amount to redeem: ");
+        double amount = scanner.nextDouble();
+        user.redeemRewards(amount);
     }
 }
 
